@@ -1,0 +1,17 @@
+{
+  "name": "react-test",
+  "version": "0.0.1",
+  "description": "Test application for react for the MoFA",
+  "main": "app.js",
+  "scripts": {
+    "start": "node source/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Salman Hasrat KHan",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "eslint-config-rallycoding": "^3.2.0",
+    "express": "^4.14.0"
+  }
+}
