@@ -3,6 +3,7 @@
  */
 import {addStudentBasicInfo, fetchStudents, getStudentNationality, updateStudent} from "../util/API";
 import {changeUserRole} from "../action/authedUser";
+import {addcurrentstudent} from "../action/currentStudent";
 export const RECEIVE_STUDENTS = 'RECEIVE_STUDENTS';
 export const UPDATE_STUDENT = 'UPDATE_STUDENT';
 export const RECEIVE_STUDENT = 'RECEIVE_STUDENT';
@@ -58,14 +59,7 @@ export function handleReceiveStudent() {
     }
 }
 
-export function handleReceiveNationality(student) {
-    return (dispatch) => {
-        return getStudentNationality(student.ID).then(({nationality}) => {
-            student['nationality'] = nationality;
-            dispatch(updatestudent({student}));
-        });
-    }
-}
+
 export function handleUpdateStudent(student) {
     return (dispatch) => {
         const isDate = student.dateOfBirth instanceof Date;
@@ -87,6 +81,7 @@ export function handleAddStudent(student) {
                 dateOfBirth: isDate ? student.dateOfBirth.toISOString() : student.dateOfBirth.toString()
             };
             dispatch(addstudent(newStudent));
+            dispatch(addcurrentstudent(newStudent));
             return newStudent
         });
     }

@@ -29,7 +29,7 @@ class UserDetails extends Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {<StudentForm basicInfo={student}/>}
+                    {<StudentForm basicInfo={this.props.student}/>}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={this.handleClose}>Close</Button>

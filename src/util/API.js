@@ -3,6 +3,7 @@
  */
 
 import axios from "axios";
+
 const host = 'http://localhost:8088/api';
 
 export function fetchStudents() {
@@ -14,7 +15,7 @@ export function fetchStudents() {
 
 export function fetchFamilyInfo(id) {
     return axios({method: 'get', url: `${host}/Students/${id}/FamilyMembers/`}).then((response) => {
-            return response.data===''?[]:response.data;
+            return response.data === '' ? [] : response.data;
         }
     );
 }
@@ -32,18 +33,21 @@ export function deleteFamilyMember(id) {
         }
     );
 }
+
 export function updateFamilyMember(family) {
     return axios({method: 'put', url: `${host}/FamilyMembers/${family.ID}`, data: family}).then((response) => {
             return response.data
         }
     );
 }
+
 export function updateStudentBasicInfo(basicInfo) {
     return axios({method: 'put', url: `${host}/Students/${basicInfo.ID}`, data: basicInfo}).then((response) => {
             return response.data
         }
     );
 }
+
 export function addStudentBasicInfo(basicInfo) {
     return axios({method: 'post', url: `${host}/Students`, data: basicInfo}).then((response) => {
             if (basicInfo.nationality) {
@@ -52,24 +56,28 @@ export function addStudentBasicInfo(basicInfo) {
         }
     );
 }
+
 export function addFamilyMemberNationality(id, nationalityId) {
     return axios({method: 'put', url: `${host}/FamilyMembers/${id}/Nationality/${nationalityId}`}).then((response) => {
             return response.data
         }
     );
 }
+
 export function getStudentNationality(id) {
     return axios({method: 'get', url: `${host}/Students/${id}/Nationality/`}).then((response) => {
             return response.data
         }
     );
 }
+
 export function upadteStudentNationality(id, nationalityID) {
     return axios({method: 'put', url: `${host}/Students/${id}/Nationality/${nationalityID}`}).then((response) => {
             return response.data
         }
     );
 }
+
 export function fetchAllNationalities() {
     return axios({method: 'get', url: `${host}/Nationalities`}).then((response) => {
             return response.data
@@ -80,7 +88,7 @@ export function fetchAllNationalities() {
 export function updateStudent(basicInfo) {
     return updateStudentBasicInfo(basicInfo).then((student) => {
         if (basicInfo.nationality) {
-            return upadteStudentNationality(student.ID, basicInfo.nationality.ID);
+            return upadteStudentNationality(student.ID, basicInfo.nationality.ID ? basicInfo.nationality.ID : basicInfo.nationality);
         }
     })
 }
@@ -115,18 +123,18 @@ export function resolveAllFamily(id, families) {
     return axios.all(
         families.map(fam => addFamilyMember(id, Object.assign({}, fam, {nationality: undefined}))))
         .then((familiesWithoutNation) => {
-        let updatedNationFamily = families.map((famli, index) => {
-            return {id: familiesWithoutNation[index]['ID'], nationalityId: famli.nationality}
-        }).filter(ids => ids.nationalityId);
-        if (updatedNationFamily.length === 0) {
-            updatedNationFamily.push(familiesWithoutNation);
-            return updatedNationFamily;
-        }
-        return resolveUpdateNationalities(updatedNationFamily);
-    }).catch((err) => {
+            let updatedNationFamily = families.map((famli, index) => {
+                return {id: familiesWithoutNation[index]['ID'], nationalityId: famli.nationality}
+            }).filter(ids => ids.nationalityId);
+            if (updatedNationFamily.length === 0) {
+                updatedNationFamily.push(familiesWithoutNation);
+                return updatedNationFamily;
+            }
+            return resolveUpdateNationalities(updatedNationFamily);
+        }).catch((err) => {
 
-        return null;
-    });
+            return null;
+        });
 }
 
 export function resolveUpdateNationalities(families) {

@@ -5,7 +5,6 @@ import React, {Component, Fragment} from "react";
 import {connect} from "react-redux";
 import {Button, Table} from "react-bootstrap";
 import UserDetails from "./UserDetail";
-import {handleReceiveNationality} from "../action/students";
 import {handleReceiveFamilyInfo} from "../action/family";
 import {addcurrentstudent} from "../action/currentStudent";
 class StudentData extends React.Component {
@@ -19,6 +18,11 @@ class StudentData extends React.Component {
     }
 
     createNew = () => {
+        this.props.dispatch(addcurrentstudent({
+            firstName: '',
+            lastName: '',
+            dateOfBirth: new Date().toISOString()
+        }));
         this.setState({
             show: true, student: {
                 firstName: '',
@@ -26,13 +30,10 @@ class StudentData extends React.Component {
                 dateOfBirth: new Date().toISOString()
             }
         });
-        //this.props.dispatch(receiveFamilyInfo([]));
+
     };
     selectDetails = (student) => {
         const {families} = this.props;
-        if (!student.nationality) {
-            this.props.dispatch(handleReceiveNationality(student));
-        }
         this.setState(() => {
             return {show: true, student: student}
         });

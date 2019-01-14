@@ -10,8 +10,9 @@ import FormFields from "./FormFields";
 import {connect} from "react-redux";
 import {addAndUpdate, handleDeleteFamilyMember} from "../action/family";
 import {handleAddStudent, handleUpdateStudent} from "../action/students";
-import {addcurrentstudent} from "../action/currentStudent";
-class StudentForm extends React.Component {
+import {addcurrentstudent, handleCurrentStudent} from "../action/currentStudent";
+
+class StudentForm extends Component {
     state = {
         formUpdateAction: false,
         basicInfo: {
@@ -39,6 +40,9 @@ class StudentForm extends React.Component {
 
     componentDidMount() {
         const {basicInfo, families} = this.props;
+        if (!basicInfo.nationality && basicInfo.ID) {
+            this.props.dispatch(handleCurrentStudent(Object.assign({}, basicInfo)));
+        }
         if (basicInfo.ID) {
             this.setState(() => ({
                 formUpdateAction: true
@@ -83,27 +87,18 @@ class StudentForm extends React.Component {
         debugger;
         event.preventDefault();
 
-        (!this.state.formUpdateAction && this.state.basicInfo !== this.props.basicInfo) && this.updateBasicInfo();
-        (this.state.formUpdateAction && this.state.families !== this.props.families) && this.addAndUpdateFamilies();
+        (this.state.basicInfo !== this.props.basicInfo) && this.updateBasicInfo();
+        (this.state.families !== this.props.families) && this.addAndUpdateFamilies();
     };
 
 
     updateBasicInfo = () => {
         const {dispatch} = this.props;
         const {basicInfo} = this.state;
-        if (this.state.formUpdateAction) {
+        if (basicInfo.ID) {
             dispatch(handleUpdateStudent(basicInfo))
         } else {
-            dispatch(handleAddStudent(basicInfo)).then(newStudent => {
-                this.setState(() => {
-                    return {
-                        basicInfo: newStudent,formUpdateAction:true
-                    }
-                });
-                dispatch(addcurrentstudent(newStudent));
-                if (this.state.families > 0)
-                    this.addAndUpdateFamilies();
-            });
+            dispatch(handleAddStudent(basicInfo));
 
         }
     };
@@ -120,15 +115,21 @@ class StudentForm extends React.Component {
         }
         if (preProps.basicInfo !== this.props.basicInfo) {
             const {basicInfo} = this.props;
+
             this.setState(() => {
                 return {
-                    basicInfo: {...basicInfo, dateOfBirth: basicInfo.dateOfBirth}
+                    basicInfo: {...basicInfo, nationality: basicInfo.nationality}
                 }
             })
         }
 
     }
 
+    checkAuth = () => {
+        const {authedUser} = this.props;
+        const {ID} = this.state.basicInfo;
+        return !!(authedUser === 'registrar' && ID)
+    };
     addAndUpdateFamilies = () => {
         const {dispatch} = this.props;
         const {basicInfo, families} = this.state;
@@ -148,22 +149,23 @@ class StudentForm extends React.Component {
                             onDateChange={this.handleDateChange}/>
                 <Col sm={10}>
                     <h3>Family Info</h3>
-                    <Button onClick={this.addNewFamilyMember}> <Glyphicon glyph="plus"/> </Button>
+                    {this.checkAuth() && <Button onClick={this.addNewFamilyMember}> <Glyphicon glyph="plus"/> </Button>}
                 </Col>
                 {
-                    families.map((fam, idx) => {
+                    Array.isArray(families) && families.map((fam, idx) => {
                         return (
                             <Fragment key={'fam_div' + idx}>
                                 <Col smOffset={10} sm={5}>
-                                    <Button key={'button' + idx}
-                                            onClick={() => this.deleteFamilyMember(basicInfo.ID, idx, fam.ID)}>
-                                        <Glyphicon glyph="minus"/> </Button>
+                                    {this.checkAuth() && <Button key={'button' + idx}
+                                                                 onClick={() => this.deleteFamilyMember(basicInfo.ID, idx, fam.ID)}>
+                                        <Glyphicon glyph="minus"/> </Button>}
                                 </Col>
 
                                 <FormFields key={'fam' + idx} family={fam} handleOnChange={this.handleOnChange}
                                             idx={idx}
                                             valueOf="families"
                                             onDateChange={this.handleDateChange}/>
+                                <hr/>
                             </Fragment>
 
                         )
@@ -181,17 +183,18 @@ class StudentForm extends React.Component {
     }
 }
 
-function mapStateToProps({currentStudent, families}) {
-
-    const getId = currentStudent ? currentStudent.ID : '';
+function mapStateToProps({currentStudent, families, authedUser}, {basicInfo}) {
+    const getId = basicInfo.ID ? basicInfo.ID : currentStudent ? currentStudent.ID : undefined;
     return {
-        families: families[getId] ? families[getId] : []
+        families: families[getId] ? families[getId] : [],
+        basicInfo: currentStudent, authedUser
     }
 }
+
 StudentForm.protoType = {
     basicInfo: PropTypes.object.isRequired,
     families: PropTypes.array.isRequired,
 };
 
 
-export  default connect(mapStateToProps)(StudentForm);
+export default connect(mapStateToProps)(StudentForm);
