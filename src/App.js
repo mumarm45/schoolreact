@@ -1,33 +1,32 @@
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 import "./App.css";
-import {handleReceiveStudent} from "./action/students";
-import StudentData from "./component/StudentData";
+import Login from "./component/Login";
+import User from "./component/User";
 import {connect} from "react-redux";
-import {Grid, Row} from "react-bootstrap";
-import {handleReceiveNationalities} from "./action/share";
+import {BrowserRouter as Router, Redirect, Route} from "react-router-dom";
 class App extends Component {
-    componentDidMount() {
-        this.props.dispatch(handleReceiveStudent());
-        this.props.dispatch(handleReceiveNationalities());
+
+    isLogin() {
+        const {authedUser} = this.props;
+        return authedUser;
     }
+
 
     render() {
-        const {loading} = this.props;
-            if (loading === true) {
-                return <h1>Loading..</h1>
-            } else {
-                return (<Grid>
-                    <Row>
-                        <StudentData  d="d"/>
-                    </Row>
-                </Grid>)
-            }
+
+        return (
+            <Router>
+                <Route exact path="/user" component={User} />
+                <Route exact path="/" component={Login}/>
+            </Router>
+
+        )
     }
 }
 
-function mapStateToProps({authedUser, students}) {
+const mapStateToProps = ({authedUser}, props) => {
     return {
-        loading: students.length===0
+        authedUser
     }
-}
+};
 export default connect(mapStateToProps)(App);

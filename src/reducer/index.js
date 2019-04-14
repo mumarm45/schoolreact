@@ -3,12 +3,10 @@
  */
 
 import {combineReducers} from "redux";
-import students from "./students";
-import families from "./families";
-import nationalities from "./share";
+import User from "./User";
 import authedUser from "./AuthUser";
-import currentStudent from "./currentStudent";
+
 
 export default combineReducers({
-    students, authedUser,families,nationalities,currentStudent
+    User, authedUser
 });

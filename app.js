@@ -6,7 +6,7 @@ const app = express();
 app.use(bodyParser.json());
 
 
-app.use(express.static('../../build/'));
+app.use(express.static('./build/'));
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
